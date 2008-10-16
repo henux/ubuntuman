@@ -1,3 +1,9 @@
+2008-10-16  Henri Häkkinen  <henux@users.sourceforge.net>
+
+	* plugin.py: General code cleanup and rebuild the parser.
+	Commands now accept --rel option.  Removed the non-English manual
+	page support (to be written latter).
+
 2008-10-15  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* Added GPL headers to each file.
