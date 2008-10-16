@@ -49,10 +49,11 @@ manurl <command> [--rel <release>]
 
     Gives the URL of the full manual page in the Ubuntu Manpage Repository.
 
-Commands accept --rel option, which is be used to override the default
-Ubuntu release.  For example, to see manual page for the 'ls' command as it
-is in Ubuntu Intrepid Ibex, use "man --rel intrepid ls".  If the option is
-not given, the configured default is used.
+Commands accept --rel option, which can be used to override the default
+Ubuntu release the manual pages are fetched for.  For example, to see
+manual page for the 'ls' command as it exists in Ubuntu Intrepid , use "man
+ls --rel intrepid".  If the option is not given, the configured default is
+used.
 
 
 CONFIGURATION VARIABLES
@@ -72,5 +73,6 @@ supybot.plugins.UbuntuMan.release
 
 supybot.plugins.UbuntuMan.sections
 
-    Space separated list of enabled sections.
+    Space separated list of enabled sections.  Note this variable has a
+    different syntax than in the version 1.0.
     Default value: 1 6 8
