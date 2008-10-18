@@ -1,3 +1,7 @@
+2008-10-18  Henri Häkkinen  <henux@users.sourceforge.net>
+
+	* plugin.py: Fixed the help messages a bit.
+
 2008-10-16  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* plugin.py: General code cleanup and rebuild the parser.
