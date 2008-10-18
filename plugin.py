@@ -128,7 +128,7 @@ class UbuntuMan(callbacks.Plugin):
         return msg[:idx + 1]
 
     def man(self, irc, msg, args, command, optlist):
-        """[--rel <release>] <command>
+        """<command> [--rel <release>]
 
         Displays a manual page from the Ubuntu Manpage Repositor."""
         release = None
@@ -150,7 +150,7 @@ class UbuntuMan(callbacks.Plugin):
             irc.reply('Failed to parse the manpage: ' + e.message)
 
     def manurl(self, irc, msg, args, command, optlist):
-        """[--rel <release>] <command>
+        """<command> [--rel <release>]
 
         Gives the URL to the full manual page in the Ubuntu Manpage
         Repository."""
