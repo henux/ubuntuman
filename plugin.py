@@ -1,4 +1,5 @@
 # Copyright (c) 2008 Henri Hakkinen
+# -*- Encoding: UTF-8 -*-
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +21,6 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.registry as registry
 import supybot.conf as conf
-import urllib
 
 class UbuntuManError(Exception):
     """Ubuntu manual page exception.  Raised when an expected section is
@@ -62,7 +62,7 @@ class UbuntuManParser:
         self.desc = self.__skipToSection(fd, 'DESCRIPTION')
         while True:
             ln = fd.readline()
-            if not ln or ln.startswith(" </pre>") or len(ln) == 0:
+            if not ln or ln.startswith(' </pre>') or len(ln) == 0:
                 break
             if ln.endswith('\xe2\x80\x90\x0a'):
                 self.desc += ln[:len(ln) - 4]
@@ -71,8 +71,9 @@ class UbuntuManParser:
         self.desc = utils.web.htmlToText(self.desc, tagReplace='')
         self.desc = utils.web.normalizeWhitespace(self.desc)
 
-    def parse(self, fd):
+    def parse(self, fd, command):
         """Parse the HTML manual page from the given file descriptor."""
+        self.command = command
         for x in range(43):
             fd.readline()
         self.__parseName(fd)
@@ -86,18 +87,15 @@ class UbuntuMan(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(UbuntuMan, self)
         self.__parent.__init__(irc)
-        self.conf = conf.supybot.plugins.UbuntuMan
         self.parser = UbuntuManParser()
 
     def __buildUrl(self, release, section, command):
         """Build URL to a manual page."""
-        url = self.conf.baseurl.value + '/'
         if release:
-            url += urllib.quote_plus(release) + '/'
+            url = '/%s/man%s/%s.html' % (release, section, command)
         else:
-            url += urllib.quote_plus(self.conf.release.value) + '/'
-        url += 'man' + urllib.quote_plus(section) + '/'
-        url += urllib.quote_plus(command) + '.html'
+            url = '/%s/man%s/%s.html' % (self.registryValue('release'), section, command)
+        url = self.registryValue('baseurl') + utils.web.urlquote(url)
         return url
 
     def __tryUrl(self, url):
@@ -111,21 +109,24 @@ class UbuntuMan(callbacks.Plugin):
     def __getManPageFd(self, release, command):
         """Get a file descriptor to the manual page in the Ubuntu Manpage
         Repository."""
-        for section in self.conf.sections.value:
+        for section in self.registryValue('sections'):
             url = self.__buildUrl(release, section, command)
             fd = self.__tryUrl(url)
             if fd:
                 return fd
         return None
 
-    def __formatReply(self, name, synopsis, desc):
+    def __formatReply(self):
         """Format the data for the IRC reply."""
         msg = self.parser.name + ' | ' \
             + self.parser.synopsis + ' | ' \
             + self.parser.desc
-        msg = msg[:conf.supybot.reply.mores.length.value + 1]
+        length = conf.supybot.reply.mores.length()
+        if not length:
+            length = 300
+        msg = msg[:length + 1]
         idx = msg.rfind('.')
-        return msg[:idx + 1]
+        return msg[:idx + 1] #+ " | see « man %s » for more" % self.parser.command
 
     def man(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>]
@@ -140,14 +141,12 @@ class UbuntuMan(callbacks.Plugin):
             if not fd:
                 irc.reply("No manual page for " + command)
                 return
-            self.parser.parse(fd)
+            self.parser.parse(fd, command)
             del fd
-            msg = self.__formatReply(self.parser.name,
-                                     self.parser.synopsis,
-                                     self.parser.desc)
+            msg = self.__formatReply()
             irc.reply(msg)
         except UbuntuManError, e:
-            irc.reply('Failed to parse the manpage: ' + e.message)
+            irc.reply('Failed to parse the manpage for \'%s\': %s' % (command, e.message))
 
     def manurl(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>]
@@ -158,7 +157,7 @@ class UbuntuMan(callbacks.Plugin):
         for (opt, arg) in optlist:
             if opt == 'rel':
                 release = arg
-        for section in self.conf.sections.value:
+        for section in self.registryValue('sections'):
             try:
                 url = self.__buildUrl(release, section, command)
                 fd = self.__tryUrl(url)
@@ -169,7 +168,7 @@ class UbuntuMan(callbacks.Plugin):
                 del fd
             except utils.web.Error:
                 pass
-        irc.reply("No manual page for " + command)
+        irc.reply('No manual page for \'%s\'' % command)
 
     man = wrap(man, ['something', getopts({'rel': 'something'})])
     manurl = wrap(manurl, ['something', getopts({'rel': 'something'})])

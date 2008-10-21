@@ -1,3 +1,9 @@
+2008-10-20  Henri Häkkinen  <henux@users.sourceforge.net>
+
+	* plugin.py (UbuntuMan.__formatReply): Uses 300 chars as default
+	reply length if supybot.reply.mores.length is not defined.
+	* plugin.py: General code cleanupping
+
 2008-10-18  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* plugin.py: Fixed the help messages a bit.

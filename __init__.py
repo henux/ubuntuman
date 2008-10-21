@@ -23,17 +23,14 @@ Repository.
 import supybot
 import supybot.world as world
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
-# XXX Replace this with an appropriate author or supybot.Author instance.
 __author__ = supybot.Author('Henri Hakkinen', 'henux',
                             'henux@users.sourceforge.net')
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.
-__contributors__ = {}
+__contributors__ = {supybot.Author('Terence Simpson', 'stdin', ''): ''}
 
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = 'http://henux.nor.fi/coding/projects/9-other/7-ubuntuman'

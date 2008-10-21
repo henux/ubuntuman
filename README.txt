@@ -33,7 +33,8 @@ the plugin was made by the same author, until the Ubuntu Manpage Repository
 was decided on.
 
 Thanks to emma and bascule for their continued support and several others
-in ##club-ubuntu for bug testing.
+in ##club-ubuntu for bug testing.  Also thanks to Terence Simpson for his
+contribution.
 
 
 USAGE
