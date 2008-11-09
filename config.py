@@ -35,9 +35,14 @@ def configure(advanced):
     sections = something("""What manual page sections should be enabled?""",
                          default='1 5 8')
 
+    language = expect("""Which language should be used by default?""",
+                      possibilities=['en', 'es', 'de', 'fi'],
+                      default='en')
+
     UbuntuMan.baseurl.setValue(baseurl)
     UbuntuMan.release.setValue(release)
     UbuntuMan.sections.setValue(sections)
+    UbuntuMan.language.setValue(language)
 
 
 UbuntuMan = conf.registerPlugin('UbuntuMan')
@@ -54,5 +59,9 @@ conf.registerGlobalValue(UbuntuMan, 'release',
 conf.registerGlobalValue(UbuntuMan, 'sections',
     registry.SpaceSeparatedListOfStrings(['1', '5', '8'],
              """Determines the list of enabled manual page sections."""))
+
+conf.registerGlobalValue(UbuntuMan, 'language',
+    registry.String('en',
+             """Determines the default language. Currently supported: en, es, de, fi"""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

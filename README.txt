@@ -34,27 +34,27 @@ was decided on.
 
 Thanks to emma and bascule for their continued support and several others
 in ##club-ubuntu for bug testing.  Also thanks to Terence Simpson for his
-contribution.
+contribution and to Elián Hanisch for non-English manual page support.
 
 
 USAGE
 
 The plugin provides the following new Supybot commands:
 
-man <command> [--rel <release>]
+man <command> [--rel <release>] [--lang <language>]
 
     Prints a short version of the manual page from the Ubuntu Manpage
     Repository.
 
-manurl <command> [--rel <release>]
+manurl <command> [--rel <release>] [--lang <language>]
 
     Gives the URL of the full manual page in the Ubuntu Manpage Repository.
 
-Commands accept --rel option, which can be used to override the default
-Ubuntu release the manual pages are fetched for.  For example, to see
-manual page for the 'ls' command as it exists in Ubuntu Intrepid , use "man
-ls --rel intrepid".  If the option is not given, the configured default is
-used.
+Commands accept --rel and --lang options, which can be used to override the
+default Ubuntu release and language the manual pages are fetched for.  For
+example, to see the Spanish manual page for the 'ls' command as it exists
+in Ubuntu Hardy , use "man ls --rel hardy --lang es".  If these options are
+not given, the configured defaults are used.
 
 
 CONFIGURATION VARIABLES
@@ -70,10 +70,16 @@ supybot.plugins.UbuntuMan.release
 
     The default release to fetch the manual pages for.  This should be one
     of the following: dapper, feisty, gutsy, hardy, intrepid.
-    Default value: hardy
+    Default value: intrepid
 
 supybot.plugins.UbuntuMan.sections
 
     Space separated list of enabled sections.  Note this variable has a
     different syntax than in the version 1.0.
     Default value: 1 6 8
+
+supybot.plugins.UbuntuMan.language
+
+    The default language used to fetch the manual pages for.  This should
+    be one of the following: en, es, ge, fi.
+    Default value: en

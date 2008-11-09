@@ -1,3 +1,8 @@
+This ChangeLog is no longer maintained.  Please see the commit log of the
+source control repository for change tracking.
+
+----------------------------------------------------------------------
+
 2008-10-20  Henri Häkkinen  <henux@users.sourceforge.net>
 
 	* plugin.py (UbuntuMan.__formatReply): Uses 300 chars as default

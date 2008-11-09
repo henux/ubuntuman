@@ -23,14 +23,14 @@ Repository.
 import supybot
 import supybot.world as world
 
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
-__author__ = supybot.Author('Henri Hakkinen', 'henux',
-                            'henux@users.sourceforge.net')
+__author__ = supybot.Author('Henri Hakkinen', 'henux', 'henux@users.sourceforge.net')
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.
-__contributors__ = {supybot.Author('Terence Simpson', 'stdin', ''): ''}
+__contributors__ = {supybot.Author('Terence Simpson', 'stdin', ''): '',
+                    supybot.Author('Elián Hanisch', 'm4v', 'lambdae2@gmail.com'): ''}
 
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = 'http://henux.nor.fi/coding/projects/9-other/7-ubuntuman'

@@ -21,6 +21,7 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.registry as registry
 import supybot.conf as conf
+import sys
 
 class UbuntuManError(Exception):
     """Ubuntu manual page exception.  Raised when an expected section is
@@ -31,16 +32,23 @@ class UbuntuManError(Exception):
 class UbuntuManParser:
     """Ubunutu manual page parser."""
 
-    def __skipToSection(self, fd, sect):
+    def skipToSection(self, fd, sect):
         """Skips lines until '<h3>SECTION</h3>' is found and returns the
         rest of the line as a string with whitespaces normalized and HTML
-        tags removed."""
+        tags removed.  'sect' can be a string or a tuple of strings."""
         while True:
             ln = fd.readline()
             if not ln:
                 raise UbuntuManError('Section ' + sect + ' not found.')
-            tag = '<h3>' + sect + '</h3>'
-            offs = ln.find(tag)
+            if sect.__class__ == tuple: # check whenever sect is a string or a tuple
+                for s in sect:
+                    tag = '<h3>' + s + '</h3>'
+                    offs = ln.find(tag)
+                    if offs != -1:
+                        break
+            else:
+                tag = '<h3>' + sect + '</h3>'
+                offs = ln.find(tag)
             if offs == -1:
                 continue
             ln = ln[offs + len(tag) + 5:]
@@ -48,18 +56,18 @@ class UbuntuManParser:
             ln = utils.str.normalizeWhitespace(ln)
             return ln
 
-    def __parseName(self, fd):
+    def parseName(self, fd, sect='NAME'):
         """Parse the NAME section."""
-        self.name = self.__skipToSection(fd, 'NAME')
+        self.name = self.skipToSection(fd, sect)
 
-    def __parseSynopsis(self, fd):
+    def parseSynopsis(self, fd, sect='SYNOPSIS'):
         """Parse the SYNOPSIS section.  Only the first line is read."""
-        self.synopsis = self.__skipToSection(fd, 'SYNOPSIS')
+        self.synopsis = self.skipToSection(fd, sect)
 
-    def __parseDesc(self, fd):
+    def parseDesc(self, fd, sect='DESCRIPTION'):
         """Parse the DESCRIPTION section.  Only the first paragraph is
         read."""
-        self.desc = self.__skipToSection(fd, 'DESCRIPTION')
+        self.desc = self.skipToSection(fd, sect)
         while True:
             ln = fd.readline()
             if not ln or ln.startswith(' </pre>') or len(ln) == 0:
@@ -76,9 +84,70 @@ class UbuntuManParser:
         self.command = command
         for x in range(43):
             fd.readline()
-        self.__parseName(fd)
-        self.__parseSynopsis(fd)
-        self.__parseDesc(fd)
+        self.parseName(fd)
+        self.parseSynopsis(fd)
+        self.parseDesc(fd)
+
+class UbuntuManParser_en(UbuntuManParser):
+    """Ubuntu manual page parser for English."""
+    pass
+
+class UbuntuManParser_es(UbuntuManParser):
+    """Ubuntu manual page parser for Spanish."""
+
+    def parseName(self, fd):
+        UbuntuManParser.parseName(self,fd, ('NOMBRE', 'NAME'))
+
+    def parseSynopsis(self, fd):
+        UbuntuManParser.parseSynopsis(self, fd, ('SINOPSIS', 'SINTAXIS'))
+
+    def parseDesc(self, fd):
+        # Should be just DESCRIPCIÓN, but meh :/
+        UbuntuManParser.parseDesc(self, fd,
+                                  ('DESCRIPCI   N',
+                                   'DESCRIPCI?N',
+                                   'DESCRIPCION',
+                                   'DESCRIPTION',
+                                   'DESCRIPCIÓN'))
+
+class UbuntuManParser_de(UbuntuManParser):
+    """Ubunutu manual page parser for German."""
+
+    def parseName(self, fd):
+        UbuntuManParser.parseName(self, fd, ('BEZEICHNUNG', 'NAME'))
+
+    def parseSynopsis(self, fd):
+        # German synopsis sections aren't formated right, taking that into
+        # account..
+        sect = 'BERSICHT'
+        while True:
+            ln = fd.readline()
+            if not ln:
+                raise UbuntuManError('Section ' + sect + ' not found.')
+            tag = sect
+            offs = ln.find(tag)
+            if offs == -1:
+                continue
+            ln = fd.readline()
+            ln = utils.web.htmlToText(ln, tagReplace='')
+            ln = utils.str.normalizeWhitespace(ln)
+            break
+        self.synopsis = ln
+
+    def parseDesc(self, fd):
+        UbuntuManParser.parseDesc(self, fd, sect='BESCHREIBUNG')
+
+class UbuntuManParser_fi(UbuntuManParser):
+    """Ubuntu manual page parser for Finnish."""
+
+    def parseName(self, fd):
+        UbuntuManParser.parseName(self, fd, ('NAME', 'NIMI'))
+
+    def parseSynopsis(self, fd):
+        UbuntuManParser.parseSynopsis(self, fd, ('SYNOPSIS', 'YLEISKATSAUS'))
+
+    def parseDesc(self, fd):
+        UbuntuManParser.parseDesc(self, fd, 'KUVAUS')
 
 class UbuntuMan(callbacks.Plugin):
     """This plugin provides commands for displaying UNIX manual pages from
@@ -87,14 +156,27 @@ class UbuntuMan(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(UbuntuMan, self)
         self.__parent.__init__(irc)
-        self.parser = UbuntuManParser()
+        self.currentParser = None
 
-    def __buildUrl(self, release, section, command):
+    def __setParser(self, language):
+        parserClass  = 'UbuntuManParser_' + language
+        if parserClass == self.currentParser:
+            # Don't initialise the parser again if it isn't needed.
+            return
+        module = sys.modules['UbuntuMan.plugin']
+        # Looks for the parser class that matchs the language set in the
+        # config, or defaults to UbuntuManParser_en.
+        self.parser = hasattr(module , parserClass) \
+            and getattr(module,parserClass)() \
+            or UbuntuManParser_en()
+        self.currentParser = parserClass
+
+    def __buildUrl(self, release, section, command, language):
         """Build URL to a manual page."""
         if release:
-            url = '/%s/man%s/%s.html' % (release, section, command)
+            url = '/%s/%s/man%s/%s.html' % (release, language, section, command)
         else:
-            url = '/%s/man%s/%s.html' % (self.registryValue('release'), section, command)
+            url = '/%s/%s/man%s/%s.html' % (self.registryValue('release'), language, section, command)
         url = self.registryValue('baseurl') + utils.web.urlquote(url)
         return url
 
@@ -106,14 +188,16 @@ class UbuntuMan(callbacks.Plugin):
         except utils.web.Error:
             return None
 
-    def __getManPageFd(self, release, command):
+    def __getManPageFd(self, release, command, language):
         """Get a file descriptor to the manual page in the Ubuntu Manpage
         Repository."""
         for section in self.registryValue('sections'):
-            url = self.__buildUrl(release, section, command)
-            fd = self.__tryUrl(url)
-            if fd:
-                return fd
+            for lang in (language, 'en'):
+                url = self.__buildUrl(release, section, command, lang)
+                fd = self.__tryUrl(url)
+                if fd:
+                    self.__setParser(lang)
+                    return fd
         return None
 
     def __formatReply(self):
@@ -126,18 +210,24 @@ class UbuntuMan(callbacks.Plugin):
             length = 300
         msg = msg[:length + 1]
         idx = msg.rfind('.')
-        return msg[:idx + 1] #+ " | see « man %s » for more" % self.parser.command
+        if idx < 1:
+            return msg[:idx - 3] + "..."
+        else:
+            return msg[:idx + 1]
 
     def man(self, irc, msg, args, command, optlist):
-        """<command> [--rel <release>]
+        """<command> [--rel <release>] [--lang <language>]
 
-        Displays a manual page from the Ubuntu Manpage Repositor."""
+        Displays a manual page from the Ubuntu Manpage Repository."""
         release = None
+        language = self.registryValue('language')
         for (opt, arg) in optlist:
             if opt == 'rel':
                 release = arg
+            elif opt == 'lang':
+                language = arg
         try:
-            fd = self.__getManPageFd(release, command)
+            fd = self.__getManPageFd(release, command, language)
             if not fd:
                 irc.reply("No manual page for " + command)
                 return
@@ -149,29 +239,35 @@ class UbuntuMan(callbacks.Plugin):
             irc.reply('Failed to parse the manpage for \'%s\': %s' % (command, e.message))
 
     def manurl(self, irc, msg, args, command, optlist):
-        """<command> [--rel <release>]
+        """<command> [--rel <release>] [--lang <language>]
 
         Gives the URL to the full manual page in the Ubuntu Manpage
         Repository."""
         release = None
+        language = self.registryValue('language')
         for (opt, arg) in optlist:
             if opt == 'rel':
                 release = arg
+            elif opt == 'lang':
+                language = arg
         for section in self.registryValue('sections'):
             try:
-                url = self.__buildUrl(release, section, command)
-                fd = self.__tryUrl(url)
-                if fd:
-                    irc.reply(url)
-                    del fd
-                    return
+                for lang in (language, 'en'):
+                    url = self.__buildUrl(release, section, command, lang)
+                    fd = self.__tryUrl(url)
+                    if fd:
+                        irc.reply(url)
+                        del fd
+                        return
                 del fd
             except utils.web.Error:
                 pass
         irc.reply('No manual page for \'%s\'' % command)
 
-    man = wrap(man, ['something', getopts({'rel': 'something'})])
-    manurl = wrap(manurl, ['something', getopts({'rel': 'something'})])
+    man = wrap(man, ['something', getopts({'rel': 'something',
+                                           'lang' : 'something'})])
+    manurl = wrap(manurl, ['something', getopts({'rel': 'something',
+                                                 'lang' : 'something'})])
 
 
 Class = UbuntuMan
