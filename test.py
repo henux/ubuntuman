@@ -18,7 +18,25 @@
 
 from supybot.test import *
 
+UbuntuMan = plugin.loadPluginModule('UbuntuMan')
+UMConf = conf.supybot.plugins.UbuntuMan
+
 class UbuntuManTestCase(PluginTestCase):
     plugins = ('UbuntuMan',)
+
+    def testMan(self):
+        self.assertRegexp('man grep', '^grep.*\|')
+        self.assertRegexp('man ls', '^ls.*\|')
+        self.assertRegexp('man asdasd', '^No manual page for')
+
+    def testManurl(self):
+        (base, rel, lang) = (UMConf.baseurl, UMConf.release, UMConf.language)
+        url = '%s/%s/%s/man1/cat.1.html' % (base, rel, lang)
+        self.assertResponse('manurl cat', url)
+
+    def testLanguages(self):
+        for s in ('en','es','de','fi'):
+            self.assertNotRegexp('man ls --lang %s' % s, '^Failed to parse')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
