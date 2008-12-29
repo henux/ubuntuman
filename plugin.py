@@ -1,5 +1,5 @@
-# Copyright (c) 2008 Henri Hakkinen
 # -*- Encoding: UTF-8 -*-
+# Copyright (c) 2008 Henri Häkkinen
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -173,10 +173,10 @@ class UbuntuMan(callbacks.Plugin):
 
     def __buildUrl(self, release, section, command, language):
         """Build URL to a manual page."""
-        if release:
-            url = '/%s/%s/man%s/%s.html' % (release, language, section, command)
-        else:
-            url = '/%s/%s/man%s/%s.html' % (self.registryValue('release'), language, section, command)
+        if not release:
+            release = self.registryValue('release')
+        url = '/%s/%s/man%s/%s.%s.html' % (release, language, section,
+                    command, section)
         url = self.registryValue('baseurl') + utils.web.urlquote(url)
         return url
 
