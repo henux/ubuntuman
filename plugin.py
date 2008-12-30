@@ -32,29 +32,25 @@ class UbuntuManError(Exception):
 class UbuntuManParser:
     """Ubunutu manual page parser."""
 
-    def skipToSection(self, fd, sect):
+    def skipToSection(self, fd, section):
         """Skips lines until '<h3>SECTION</h3>' is found and returns the
         rest of the line as a string with whitespaces normalized and HTML
-        tags removed.  'sect' can be a string or a tuple of strings."""
+        tags removed.  'section' can be a string or a tuple of strings."""
+        if section.__class__ == str: # check if section is a string
+            section = (section,)
         while True:
             ln = fd.readline()
             if not ln:
-                raise UbuntuManError('Section ' + sect + ' not found.')
-            if sect.__class__ == tuple: # check whenever sect is a string or a tuple
-                for s in sect:
-                    tag = '<h3>' + s + '</h3>'
-                    offs = ln.find(tag)
-                    if offs != -1:
-                        break
-            else:
-                tag = '<h3>' + sect + '</h3>'
-                offs = ln.find(tag)
-            if offs == -1:
-                continue
-            ln = ln[offs + len(tag) + 5:]
-            ln = utils.web.htmlToText(ln, tagReplace='')
-            ln = utils.str.normalizeWhitespace(ln)
-            return ln
+                raise UbuntuManError('Section %s not found.' % \
+                        ", ".join(section))
+            for s in section:
+                tag = '<h3>%s</h3>' % s
+                idx = ln.find(tag)
+                if idx > -1:
+                    ln = ln[idx + len(tag) + 5:]
+                    ln = utils.web.htmlToText(ln, tagReplace='')
+                    ln = utils.str.normalizeWhitespace(ln)
+                    return ln
 
     def parseName(self, fd, sect='NAME'):
         """Parse the NAME section."""
