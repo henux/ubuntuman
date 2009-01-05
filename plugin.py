@@ -37,12 +37,12 @@ class UbuntuManParser:
         rest of the line as a string with whitespaces normalized and HTML
         tags removed.  'section' can be a string or a tuple of strings."""
         if section.__class__ == str: # check if section is a string
-            section = (section,)
+            section = (section, )
         while True:
             ln = fd.readline()
             if not ln:
                 raise UbuntuManError('Section %s not found.' % \
-                        ", ".join(section))
+                        ', '.join(section))
             for s in section:
                 tag = '<h3>%s</h3>' % s
                 idx = ln.find(tag)
@@ -52,18 +52,18 @@ class UbuntuManParser:
                     ln = utils.str.normalizeWhitespace(ln)
                     return ln
 
-    def parseName(self, fd, sect='NAME'):
+    def parseName(self, fd, section='NAME'):
         """Parse the NAME section."""
-        self.name = self.skipToSection(fd, sect)
+        self.name = self.skipToSection(fd, section)
 
-    def parseSynopsis(self, fd, sect='SYNOPSIS'):
+    def parseSynopsis(self, fd, section='SYNOPSIS'):
         """Parse the SYNOPSIS section.  Only the first line is read."""
-        self.synopsis = self.skipToSection(fd, sect)
+        self.synopsis = self.skipToSection(fd, section)
 
-    def parseDesc(self, fd, sect='DESCRIPTION'):
+    def parseDesc(self, fd, section='DESCRIPTION'):
         """Parse the DESCRIPTION section.  Only the first paragraph is
         read."""
-        self.desc = self.skipToSection(fd, sect)
+        self.desc = self.skipToSection(fd, section)
         while True:
             ln = fd.readline()
             if not ln or ln.startswith(' </pre>') or len(ln) == 0:
@@ -115,12 +115,12 @@ class UbuntuManParser_de(UbuntuManParser):
     def parseSynopsis(self, fd):
         # German synopsis sections aren't formated right, taking that into
         # account..
-        sect = 'BERSICHT'
+        section = 'BERSICHT'
         while True:
             ln = fd.readline()
             if not ln:
-                raise UbuntuManError('Section ' + sect + ' not found.')
-            tag = sect
+                raise UbuntuManError('Section %s not found.' % section)
+            tag = section
             offs = ln.find(tag)
             if offs == -1:
                 continue
@@ -131,7 +131,7 @@ class UbuntuManParser_de(UbuntuManParser):
         self.synopsis = ln
 
     def parseDesc(self, fd):
-        UbuntuManParser.parseDesc(self, fd, sect='BESCHREIBUNG')
+        UbuntuManParser.parseDesc(self, fd, section='BESCHREIBUNG')
 
 class UbuntuManParser_fi(UbuntuManParser):
     """Ubuntu manual page parser for Finnish."""
@@ -188,7 +188,7 @@ class UbuntuMan(callbacks.Plugin):
         """Get a file descriptor to the manual page in the Ubuntu Manpage
         Repository."""
         if language == 'en':
-            language = (language,)
+            language = (language, )
         else:
             language = (language, 'en')
         for section in self.registryValue('sections'):
@@ -204,16 +204,15 @@ class UbuntuMan(callbacks.Plugin):
 
     def __formatReply(self):
         """Format the data for the IRC reply."""
-        msg = self.parser.name + ' | ' \
-            + self.parser.synopsis + ' | ' \
-            + self.parser.desc
+        msg = '%s | %s | %s' % (self.parser.name, self.parser.synopsis,
+                self.parser.desc)
         length = conf.supybot.reply.mores.length()
         if not length:
             length = 300
         msg = msg[:length + 1]
         idx = msg.rfind('.')
         if idx < 1:
-            return msg[:idx - 3] + "..."
+            return msg[:idx - 3] + '...'
         else:
             return msg[:idx + 1]
 
