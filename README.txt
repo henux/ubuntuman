@@ -69,17 +69,17 @@ supybot.plugins.UbuntuMan.baseurl
 supybot.plugins.UbuntuMan.release
 
     The default release to fetch the manual pages for.  This should be one
-    of the following: dapper, feisty, gutsy, hardy, intrepid.
+    of the following: dapper, gutsy, hardy, intrepid, jaunty.
     Default value: intrepid
 
 supybot.plugins.UbuntuMan.sections
 
     Space separated list of enabled sections.  Note this variable has a
     different syntax than in the version 1.0.
-    Default value: 1 6 8
+    Default value: 1 5 8
 
 supybot.plugins.UbuntuMan.language
 
     The default language used to fetch the manual pages for.  This should
-    be one of the following: en, es, ge, fi.
+    be one of the following: en, es, de, fi.
     Default value: en
