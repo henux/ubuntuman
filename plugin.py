@@ -187,11 +187,17 @@ class UbuntuMan(callbacks.Plugin):
     def __getManPageFd(self, release, command, language):
         """Get a file descriptor to the manual page in the Ubuntu Manpage
         Repository."""
+        if language == 'en':
+            language = (language,)
+        else:
+            language = (language, 'en')
         for section in self.registryValue('sections'):
-            for lang in (language, 'en'):
+            for lang in language:
                 url = self.__buildUrl(release, section, command, lang)
+                self.log.debug('Trying url: %s' % url)
                 fd = self.__tryUrl(url)
                 if fd:
+                    self.log.debug('Success')
                     self.__setParser(lang)
                     return fd
         return None
