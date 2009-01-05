@@ -33,6 +33,9 @@ class UbuntuManTestCase(PluginTestCase):
         (base, rel, lang) = (UMConf.baseurl, UMConf.release, UMConf.language)
         url = '%s/%s/%s/man1/cat.1.html' % (base, rel, lang)
         self.assertResponse('manurl cat', url)
+        url = '%s/%s/%s/man1/cp.1.html' % (base, 'dapper', 'es')
+        self.assertResponse('manurl cp --rel dapper --lang es', url)
+        self.assertRegexp('manurl asdasd', '^No manual page for')
 
     def testLanguages(self):
         for s in ('en','es','de'):
