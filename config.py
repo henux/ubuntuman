@@ -30,8 +30,9 @@ def configure(advanced):
                         default="http://manpages.ubuntu.com/manpages")
 
     release = expect("""What value should be used as the default Ubuntu release?""",
-                     possibilities=['dapper', 'feisty', 'gutsy', 'hardy', 'intrepid'],
-                     default='hardy')
+                     possibilities=['dapper', 'gutsy', 'hardy', 'intrepid',
+                         'jaunty'],
+                     default='intrepid')
 
     sections = something("""What manual page sections should be enabled?""",
                          default='1 5 8')
@@ -54,7 +55,7 @@ conf.registerGlobalValue(UbuntuMan, 'baseurl',
                 Do not end this variable to slash."""))
 
 conf.registerGlobalValue(UbuntuMan, 'release',
-    registry.String('hardy',
+    registry.String('intrepid',
              """Determines the default release to fetch the manual pages for."""))
 
 conf.registerGlobalValue(UbuntuMan, 'sections',
