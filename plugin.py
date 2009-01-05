@@ -231,10 +231,10 @@ class UbuntuMan(callbacks.Plugin):
         try:
             fd = self.__getManPageFd(release, command, language)
             if not fd:
-                irc.reply("No manual page for " + command)
+                irc.reply('No manual page for \'%s\'' % command)
                 return
             self.parser.parse(fd, command)
-            del fd
+            fd.close()
             msg = self.__formatReply()
             irc.reply(msg)
         except UbuntuManError, e:
@@ -252,19 +252,15 @@ class UbuntuMan(callbacks.Plugin):
                 release = arg
             elif opt == 'lang':
                 language = arg
-        for section in self.registryValue('sections'):
-            try:
-                for lang in (language, 'en'):
-                    url = self.__buildUrl(release, section, command, lang)
-                    fd = self.__tryUrl(url)
-                    if fd:
-                        irc.reply(url)
-                        del fd
-                        return
-                del fd
-            except utils.web.Error:
-                pass
-        irc.reply('No manual page for \'%s\'' % command)
+        try:
+            fd = self.__getManPageFd(release, command, language)
+            if not fd:
+                irc.reply('No manual page for \'%s\'' % command)
+                return
+            irc.reply(fd.url)
+            fd.close()
+        except:
+            pass
 
     man = wrap(man, ['something', getopts({'rel': 'something',
                                            'lang' : 'something'})])
