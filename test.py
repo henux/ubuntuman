@@ -35,8 +35,9 @@ class UbuntuManTestCase(PluginTestCase):
         self.assertResponse('manurl cat', url)
 
     def testLanguages(self):
-        for s in ('en','es','de','fi'):
+        for s in ('en','es','de'):
             self.assertNotRegexp('man ls --lang %s' % s, '^Failed to parse')
+        self.assertNotRegexp('man su --lang fi', '^Failed to parse')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
