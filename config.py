@@ -66,4 +66,8 @@ conf.registerGlobalValue(UbuntuMan, 'language',
     registry.String('en',
              """Determines the default language. Currently supported: en, es, de, fi"""))
 
+conf.registerGlobalValue(UbuntuMan, 'format',
+    registry.String('$name | $synopsis | $description',
+            """Determines de format of the reply."""))
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -63,17 +63,17 @@ class UbuntuManParser:
     def parseDesc(self, fd, section='DESCRIPTION'):
         """Parse the DESCRIPTION section.  Only the first paragraph is
         read."""
-        self.desc = self.skipToSection(fd, section)
+        self.description = self.skipToSection(fd, section)
         while True:
             ln = fd.readline()
             if not ln or ln.startswith(' </pre>') or len(ln) == 0:
                 break
             if ln.endswith('\xe2\x80\x90\x0a'):
-                self.desc += ln[:len(ln) - 4]
+                self.description += ln[:len(ln) - 4]
             else:
-                self.desc += ln.strip() + ' '
-        self.desc = utils.web.htmlToText(self.desc, tagReplace='')
-        self.desc = utils.web.normalizeWhitespace(self.desc)
+                self.description += ln.strip() + ' '
+        self.description = utils.web.htmlToText(self.description, tagReplace='')
+        self.description = utils.web.normalizeWhitespace(self.description)
 
     def parse(self, fd, command):
         """Parse the HTML manual page from the given file descriptor."""
@@ -204,8 +204,9 @@ class UbuntuMan(callbacks.Plugin):
 
     def __formatReply(self):
         """Format the data for the IRC reply."""
-        msg = '%s | %s | %s' % (self.parser.name, self.parser.synopsis,
-                self.parser.desc)
+        msg = self.registryValue('format')
+        for section in ('name', 'synopsis', 'description'):
+            msg = msg.replace('$' + section, getattr(self.parser, section))
         length = conf.supybot.reply.mores.length()
         if not length:
             length = 300
