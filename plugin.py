@@ -95,7 +95,8 @@ class UbuntuManParser_es(UbuntuManParser):
         UbuntuManParser.parseName(self,fd, ('NOMBRE', 'NAME'))
 
     def parseSynopsis(self, fd):
-        UbuntuManParser.parseSynopsis(self, fd, ('SINOPSIS', 'SINTAXIS'))
+        UbuntuManParser.parseSynopsis(self, fd, ('SINOPSIS', 'SINTAXIS',
+            'SYNOPSIS'))
 
     def parseDesc(self, fd):
         # Should be just DESCRIPCIÓN, but meh :/
