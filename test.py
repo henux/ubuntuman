@@ -42,5 +42,26 @@ class UbuntuManTestCase(PluginTestCase):
             self.assertNotRegexp('man ls --lang %s' % s, '^Failed to parse')
         self.assertNotRegexp('man su --lang fi', '^Failed to parse')
 
+    def testFormat(self):
+        cmd = 'grep'
+        confbak = conf.supybot.plugins.UbuntuMan.format()
+        try:
+            self.assertNotRegexp('man %s' % cmd, r'\$')
+            conf.supybot.plugins.UbuntuMan.format.setValue('$command')
+            self.assertResponse('man %s' % cmd, cmd)
+            conf.supybot.plugins.UbuntuMan.format.setValue('$url')
+            self.assertRegexp('man %s' % cmd,
+                    r'^http://manpages\.ubuntu\.com/manpages/\w+/en/.+html')
+            conf.supybot.plugins.UbuntuMan.format.setValue('$name')
+            self.assertRegexp('man %s' % cmd, r'^%s.{10}' % cmd)
+            conf.supybot.plugins.UbuntuMan.format.setValue('$synopsis')
+            self.assertRegexp('man %s' % cmd, r'^%s \[OPTIONS\]' % cmd)
+            conf.supybot.plugins.UbuntuMan.format.setValue('$description')
+            self.assertRegexp('man %s' % cmd, r'^%s.{10}' % cmd)
+            conf.supybot.plugins.UbuntuMan.format.setValue(
+                    'prefix | $name | $url | $description | $synopsis | subfix')
+            self.assertRegexp('man %s' % cmd, r'^prefix.*subfix$')
+        finally:
+            conf.supybot.plugins.UbuntuMan.format.setValue(confbak)
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
