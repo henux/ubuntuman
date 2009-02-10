@@ -21,6 +21,7 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.registry as registry
 import supybot.conf as conf
+import supybot.log as log
 import sys
 
 class UbuntuManError(Exception):
@@ -83,15 +84,18 @@ class UbuntuManParser:
 
     def parseName(self, fd, section='NAME'):
         """Parse the NAME section."""
+        log.debug('UbuntuManParser.parseName() parsing ...')
         self.name = self.skipToSection(fd, section)
 
     def parseSynopsis(self, fd, section='SYNOPSIS'):
         """Parse the SYNOPSIS section.  Only the first line is read."""
+        log.debug('UbuntuManParser.parseSynopsis() parsing ...')
         self.synopsis = self.skipToSection(fd, section)
 
     def parseDesc(self, fd, section='DESCRIPTION'):
         """Parse the DESCRIPTION section.  Only the first sentences that fit a
         150 char limit are read."""
+        log.debug('UbuntuManParser.parseDesc() parsing ...')
         description = self.skipToSection(fd, section)
         while len(description) < 300:
             ln = fd.readline()
@@ -288,11 +292,10 @@ class UbuntuMan(callbacks.Plugin):
                 irc.reply('No manual page for \'%s\'' % command)
                 return
             self.parser.parse(fd, command, format)
-            self.log.debug('UbuntuMan.man() name=\'%s\'' % self.parser.name)
-            self.log.debug('UbuntuMan.man() synopsis=\'%s\'' % \
-                    self.parser.synopsis)
-            self.log.debug('UbuntuMan.man() description=\'%s\'' % \
-                    self.parser.description)
+            for var in [ k for k in self.parser.keywords.keys if
+                    getattr(self.parser.keywords, k) ]:
+                log.debug('UbuntuMan.man() %s=\'%s\'' % (var,
+                    getattr(self.parser, var)))
             fd.close()
             msg = self.__formatReply()
             irc.reply(msg)
