@@ -107,7 +107,8 @@ class UbuntuManParser_es(UbuntuManParser):
         UbuntuManParser.parseName(self,fd, ('NOMBRE', 'NAME'))
 
     def parseSynopsis(self, fd):
-        UbuntuManParser.parseSynopsis(self, fd, ('SINOPSIS', 'SINTAXIS'))
+        UbuntuManParser.parseSynopsis(self, fd, ('SINOPSIS', 'SINTAXIS',
+            'SYNOPSIS'))
 
     def parseDesc(self, fd):
         # Should be just DESCRIPCIÓN, but meh :/
@@ -206,10 +207,10 @@ class UbuntuMan(callbacks.Plugin):
         for section in self.registryValue('sections'):
             for lang in language:
                 url = self.__buildUrl(release, section, command, lang)
-                self.log.debug('Trying url: %s' % url)
+                self.log.debug('UbuntuMan: Trying url %s' % url)
                 fd = self.__tryUrl(url)
                 if fd:
-                    self.log.debug('Success')
+                    self.log.debug('UbuntuMan: Success')
                     self.__setParser(lang)
                     self.parser.url = url
                     self.parser.command = command
