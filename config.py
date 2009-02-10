@@ -72,7 +72,7 @@ conf.registerGlobalValue(UbuntuMan, 'format',
     """Determines de format of the reply. Supported keywords: $command,
     $url, $name, $synopsis, $description"""))
 
-conf.registerGlobalValue(UbuntuMan, 'maxLenght',
+conf.registerGlobalValue(UbuntuMan, 'maxLength',
     registry.Integer(300, """Determines maximun length of the output, if
         supybot.reply.mores.length has a value other than zero this register
         has no effect."""))
