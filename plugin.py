@@ -271,9 +271,11 @@ class UbuntuMan(callbacks.Plugin):
             msg = self.__formatReply()
             irc.reply(msg)
         except UbuntuManError, e:
-            irc.reply('Failed to parse the manpage for \'%s\': %s' % (command, e.message))
-            self.log.info('Failed to parse the manpage in \'%s\'. Report it ' \
-                          'to the plugin maintainer.' % self.parser.url)
+            irc.reply('Failed to parse the manpage for \'%s\': %s' % (command,
+                e.message))
+            self.log.info(
+                'plugins.UbuntuMan: Failed to parse the manpage in \'%s\'. ' \
+                'Report it to the plugin maintainer.' % self.parser.url)
 
     def manurl(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>] [--lang <language>]
