@@ -43,15 +43,19 @@ class KeywordsParser:
         self.reset()
 
     def reset(self):
+        self.keysParsed = list()
         for key in self.keys:
             setattr(self, key, False)
 
     def checkKeywords(self, format):
+        L = list()
         for key in self.keys:
             if ('$' + key) in format:
                 setattr(self, key, True)
+                L.append(key)
             else:
                 setattr(self, key, False)
+        self.keysParsed = L
 
 
 class UbuntuManParser:
@@ -263,8 +267,7 @@ class UbuntuMan(callbacks.Plugin):
         if len(msg) > length:
             # if we exceed in length lest try to cut one of the vars
             # without ruining the format.
-            for var in [ k for k in self.parser.keywords.keys if
-                    getattr(self.parser.keywords, k) ]:
+            for var in self.parser.keywords.keysParsed:
                 cutLength = len(msg) - length
                 vars[var] = cut(vars[var], - cutLength)
                 msg = replace()
@@ -292,8 +295,7 @@ class UbuntuMan(callbacks.Plugin):
                 irc.reply('No manual page for \'%s\'' % command)
                 return
             self.parser.parse(fd, command, format)
-            for var in [ k for k in self.parser.keywords.keys if
-                    getattr(self.parser.keywords, k) ]:
+            for var in self.parser.keywords.keysParsed:
                 log.debug('UbuntuMan.man() %s=\'%s\'' % (var,
                     getattr(self.parser, var)))
             fd.close()
