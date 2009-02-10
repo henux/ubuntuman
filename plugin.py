@@ -230,7 +230,7 @@ class UbuntuMan(callbacks.Plugin):
         msg = replace()
         length = conf.supybot.reply.mores.length()
         if not length:
-            length = 300
+            length = self.registryValue('maxLength')
         if len(msg) > length:
             # if we exceed in length lest try to cut one of the vars
             # without ruining the format.
