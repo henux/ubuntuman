@@ -29,6 +29,12 @@ class UbuntuManError(Exception):
     encountered."""
     pass
 
+def cut(s, limit):
+    """Function for cutting a string nicely at the end of a word."""
+    idx = s[:limit - 3].rfind(' ')
+    s = '%s ...' % s[:idx]
+    return s
+
 class UbuntuManParser:
     """Ubunutu manual page parser."""
 
@@ -61,19 +67,25 @@ class UbuntuManParser:
         self.synopsis = self.skipToSection(fd, section)
 
     def parseDesc(self, fd, section='DESCRIPTION'):
-        """Parse the DESCRIPTION section.  Only the first paragraph is
-        read."""
-        self.description = self.skipToSection(fd, section)
-        while True:
+        """Parse the DESCRIPTION section.  Only the first sentences that fit a
+        150 char limit are read."""
+        description = self.skipToSection(fd, section)
+        while len(description) < 300:
             ln = fd.readline()
             if not ln or ln.startswith(' </pre>') or len(ln) == 0:
                 break
             if ln.endswith('\xe2\x80\x90\x0a'):
-                self.description += ln[:len(ln) - 4]
+                description += ln[:len(ln) - 4]
             else:
-                self.description += ln.strip() + ' '
-        self.description = utils.web.htmlToText(self.description, tagReplace='')
-        self.description = utils.web.normalizeWhitespace(self.description)
+                description = '%s%s ' %(description, ln.strip())
+        description = utils.web.htmlToText(description, tagReplace='')
+        description = utils.web.normalizeWhitespace(description)
+        idx = description[:150].rfind('.')
+        if idx < 1:
+            description = cut(description, 150)
+        else:
+            description = description[:idx + 1]
+        self.description = description
 
     def parse(self, fd, command):
         """Parse the HTML manual page from the given file descriptor."""
@@ -199,23 +211,39 @@ class UbuntuMan(callbacks.Plugin):
                 if fd:
                     self.log.debug('Success')
                     self.__setParser(lang)
+                    self.parser.url = url
+                    self.parser.command = command
                     return fd
         return None
 
     def __formatReply(self):
         """Format the data for the IRC reply."""
-        msg = self.registryValue('format')
-        for section in ('name', 'synopsis', 'description'):
-            msg = msg.replace('$' + section, getattr(self.parser, section))
+        format = self.registryValue('format')
+        vars = {
+                'url':self.parser.url,
+                'command':self.parser.command,
+                'name':self.parser.name,
+                'synopsis':self.parser.synopsis,
+                'description':self.parser.description,
+               }
+        replace = lambda : utils.str.perlVariableSubstitute(vars, format)
+        msg = replace()
         length = conf.supybot.reply.mores.length()
         if not length:
             length = 300
-        msg = msg[:length + 1]
-        idx = msg.rfind('.')
-        if idx < 1:
-            return msg[:idx - 3] + '...'
-        else:
-            return msg[:idx + 1]
+        if len(msg) > length:
+            # if we exceed in length lest try to cut one of the vars
+            # without ruining the format.
+            for var in ('description', 'name', 'synopsis'):
+                if ('$' + var) in format:
+                    cutLength = len(msg) - length
+                    vars[var] = cut(vars[var], - cutLength)
+                    msg = replace()
+                    break
+            if len(msg) > length:
+                # alright, length is really just too short
+                msg = '%s ...' %(msg[:length - 4])
+        return msg
 
     def man(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>] [--lang <language>]
@@ -234,11 +262,18 @@ class UbuntuMan(callbacks.Plugin):
                 irc.reply('No manual page for \'%s\'' % command)
                 return
             self.parser.parse(fd, command)
+            self.log.debug('UbuntuMan.man() name=\'%s\'' % self.parser.name)
+            self.log.debug('UbuntuMan.man() synopsis=\'%s\'' % \
+                    self.parser.synopsis)
+            self.log.debug('UbuntuMan.man() description=\'%s\'' % \
+                    self.parser.description)
             fd.close()
             msg = self.__formatReply()
             irc.reply(msg)
         except UbuntuManError, e:
             irc.reply('Failed to parse the manpage for \'%s\': %s' % (command, e.message))
+            self.log.info('Failed to parse the manpage in \'%s\'. Report it ' \
+                          'to the plugin maintainer.' % self.parser.url)
 
     def manurl(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>] [--lang <language>]

@@ -64,10 +64,12 @@ conf.registerGlobalValue(UbuntuMan, 'sections',
 
 conf.registerGlobalValue(UbuntuMan, 'language',
     registry.String('en',
-             """Determines the default language. Currently supported: en, es, de, fi"""))
+    """Determines the default language. Currently supported: en, es, de, fi"""))
 
 conf.registerGlobalValue(UbuntuMan, 'format',
-    registry.String('$name | $synopsis | $description',
-            """Determines de format of the reply."""))
+    registry.String(
+    '$name | $synopsis | $description | Run « man $command » in a terminal',
+    """Determines de format of the reply. Supported keywords: $command,
+    $url, $name, $synopsis, $description"""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
