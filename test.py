@@ -28,6 +28,9 @@ class UbuntuManTestCase(PluginTestCase):
         self.assertRegexp('man grep', '^grep.*\|')
         self.assertRegexp('man ls', '^ls.*\|')
         self.assertRegexp('man asdasd', '^No manual page for')
+        # test length limit
+        m = self.getMsg('man grep')
+        self.assertTrue(len(m.args[1]) <= 300)
 
     def testManurl(self):
         (base, rel, lang) = (UMConf.baseurl, UMConf.release, UMConf.language)
