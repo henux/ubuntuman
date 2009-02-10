@@ -35,8 +35,31 @@ def cut(s, limit):
     s = '%s ...' % s[:idx]
     return s
 
+class KeywordsParser:
+    """Class for check which sections of the manpage are needed."""
+    def __init__(self):
+        self.keys = ('description', 'name', 'synopsis')
+        self.reset()
+
+    def reset(self):
+        for key in self.keys:
+            setattr(self, key, False)
+
+    def checkKeywords(self, format):
+        for key in self.keys:
+            if ('$' + key) in format:
+                setattr(self, key, True)
+            else:
+                setattr(self, key, False)
+
+
 class UbuntuManParser:
     """Ubunutu manual page parser."""
+
+    def __init__(self):
+        self.keywords = KeywordsParser()
+        for key in self.keywords.keys:
+            setattr(self, key, '')
 
     def skipToSection(self, fd, section):
         """Skips lines until '<h3>SECTION</h3>' is found and returns the
@@ -87,14 +110,15 @@ class UbuntuManParser:
             description = description[:idx + 1]
         self.description = description
 
-    def parse(self, fd, command):
+    def parse(self, fd, command, format):
         """Parse the HTML manual page from the given file descriptor."""
         self.command = command
+        self.keywords.checkKeywords(format)
         for x in range(43):
             fd.readline()
-        self.parseName(fd)
-        self.parseSynopsis(fd)
-        self.parseDesc(fd)
+        self.keywords.name and self.parseName(fd)
+        self.keywords.synopsis and self.parseSynopsis(fd)
+        self.keywords.description and self.parseDesc(fd)
 
 class UbuntuManParser_en(UbuntuManParser):
     """Ubuntu manual page parser for English."""
@@ -235,12 +259,12 @@ class UbuntuMan(callbacks.Plugin):
         if len(msg) > length:
             # if we exceed in length lest try to cut one of the vars
             # without ruining the format.
-            for var in ('description', 'name', 'synopsis'):
-                if ('$' + var) in format:
-                    cutLength = len(msg) - length
-                    vars[var] = cut(vars[var], - cutLength)
-                    msg = replace()
-                    break
+            for var in [ k for k in self.parser.keywords.keys if
+                    getattr(self.parser.keywords, k) ]:
+                cutLength = len(msg) - length
+                vars[var] = cut(vars[var], - cutLength)
+                msg = replace()
+                break
             if len(msg) > length:
                 # alright, length is really just too short
                 msg = '%s ...' %(msg[:length - 4])
@@ -252,6 +276,7 @@ class UbuntuMan(callbacks.Plugin):
         Displays a manual page from the Ubuntu Manpage Repository."""
         release = None
         language = self.registryValue('language')
+        format = self.registryValue('format')
         for (opt, arg) in optlist:
             if opt == 'rel':
                 release = arg
@@ -262,7 +287,7 @@ class UbuntuMan(callbacks.Plugin):
             if not fd:
                 irc.reply('No manual page for \'%s\'' % command)
                 return
-            self.parser.parse(fd, command)
+            self.parser.parse(fd, command, format)
             self.log.debug('UbuntuMan.man() name=\'%s\'' % self.parser.name)
             self.log.debug('UbuntuMan.man() synopsis=\'%s\'' % \
                     self.parser.synopsis)
