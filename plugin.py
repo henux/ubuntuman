@@ -195,10 +195,10 @@ class UbuntuMan(callbacks.Plugin):
         for section in self.registryValue('sections'):
             for lang in language:
                 url = self.__buildUrl(release, section, command, lang)
-                self.log.debug('Trying url: %s' % url)
+                self.log.debug('UbuntuMan: Trying url %s' % url)
                 fd = self.__tryUrl(url)
                 if fd:
-                    self.log.debug('Success')
+                    self.log.debug('UbuntuMan: Success')
                     self.__setParser(lang)
                     return fd
         return None
