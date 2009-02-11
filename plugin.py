@@ -146,6 +146,19 @@ class UbuntuManParser_fi(UbuntuManParser):
     def parseDesc(self, fd):
         UbuntuManParser.parseDesc(self, fd, 'KUVAUS')
 
+class UbuntuManParser_it(UbuntuManParser):
+    """Ubuntu manual page parser for Italian."""
+
+    def parseName(self, fd):
+        UbuntuManParser.parseName(self, fd, ('NOME', 'NAME'))
+
+    def parseSynopsis(self, fd):
+        UbuntuManParser.parseSynopsis(self, fd, ('SINTASSI', 'SYNOPSIS'))
+
+    def parseDesc(self, fd):
+        UbuntuManParser.parseDesc(self, fd, ('DESCRIZIONE', 'DESCRIPTION'))
+
+
 class UbuntuMan(callbacks.Plugin):
     """This plugin provides commands for displaying UNIX manual pages from
     the Ubuntu Manpage repository."""
