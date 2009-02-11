@@ -68,8 +68,8 @@ conf.registerGlobalValue(UbuntuMan, 'language',
              es, fi, fr, it"""))
 
 conf.registerGlobalValue(UbuntuMan, 'format',
-    registry.String(
-    '$name | $synopsis | $description | Run « man $command » in a terminal',
+        registry.String(
+    '$name | $synopsis | $description',
     """Determines de format of the reply. Supported keywords: $command,
     $url, $name, $synopsis, $description"""))
 
