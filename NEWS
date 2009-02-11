@@ -1,3 +1,17 @@
+UbuntuMan 1.2.0
+===============
+
+New features and bugfixes
+
+    - Support for formatting man's output.
+    - Support for Italian and French manual pages.
+    - Fix: apt-get Spanish manpage failed parsing.
+    - Fix: in some cases, UbuntuMan would try the same
+    url twice.
+    - Fix: supybot would raise an exception if couldn't
+    find a section in a non-English manpage.
+
+
 UbuntuMan 1.1.5
 ===============
 
