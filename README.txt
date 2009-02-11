@@ -44,7 +44,8 @@ The plugin provides the following new Supybot commands:
 man <command> [--rel <release>] [--lang <language>]
 
     Prints a short version of the manual page from the Ubuntu Manpage
-    Repository.
+    Repository. The format is defined in UbuntuMan.format configuration
+    variable.
 
 manurl <command> [--rel <release>] [--lang <language>]
 
@@ -81,5 +82,27 @@ supybot.plugins.UbuntuMan.sections
 supybot.plugins.UbuntuMan.language
 
     The default language used to fetch the manual pages for.  This should
-    be one of the following: en, es, de, fi.
+    be one of the following: de, en, es, fi, fr, it.
     Default value: en
+
+supybot.plugins.UbuntuMan.format
+
+    The format of the 'man' command. This should be a string containing any
+    of the following keywords:
+    $name - manpage NAME section.
+    $synopsis - manpage SYNOPSIS section.
+    $description - manpage DESCRIPTION section.
+    $command - the name of the command.
+    $url - the url address where the manpage is located.
+    Default value:
+    $name | $synopsis | $description
+
+supybot.plugins.UbuntuMan.maxLength
+
+    Maximun number of characters the 'man' command can use. If the output
+    excess this value one of the manpage sections (normally DESCRIPTION) is
+    cut for fit the limit, if still is too long then the whole reply is cut.
+    Note that supybot.reply.mores.length takes priority over this variable if
+    its value is other than zero.
+    Default value: 300
+
