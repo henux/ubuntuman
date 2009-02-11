@@ -14,14 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import supybot.log as log
+import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
-import supybot.callbacks as callbacks
 import supybot.registry as registry
-import supybot.conf as conf
-import supybot.log as log
+import supybot.callbacks as callbacks
+
 import sys
 
 class UbuntuManError(Exception):
@@ -88,18 +89,18 @@ class UbuntuManParser:
 
     def parseName(self, fd, section='NAME'):
         """Parse the NAME section."""
-        log.debug('UbuntuManParser.parseName() parsing ...')
+        #log.debug('UbuntuManParser.parseName() parsing ...')
         self.name = self.skipToSection(fd, section)
 
     def parseSynopsis(self, fd, section='SYNOPSIS'):
         """Parse the SYNOPSIS section.  Only the first line is read."""
-        log.debug('UbuntuManParser.parseSynopsis() parsing ...')
+        #log.debug('UbuntuManParser.parseSynopsis() parsing ...')
         self.synopsis = self.skipToSection(fd, section)
 
     def parseDesc(self, fd, section='DESCRIPTION'):
         """Parse the DESCRIPTION section.  Only the first sentences that fit a
         150 char limit are read."""
-        log.debug('UbuntuManParser.parseDesc() parsing ...')
+        #log.debug('UbuntuManParser.parseDesc() parsing ...')
         description = self.skipToSection(fd, section)
         while len(description) < 300:
             ln = fd.readline()
@@ -260,10 +261,10 @@ class UbuntuMan(callbacks.Plugin):
         for section in self.registryValue('sections'):
             for lang in language:
                 url = self.__buildUrl(release, section, command, lang)
-                self.log.debug('UbuntuMan: Trying url %s' % url)
+                #self.log.debug('UbuntuMan: Trying url %s' % url)
                 fd = self.__tryUrl(url)
                 if fd:
-                    self.log.debug('UbuntuMan: Success')
+                    #self.log.debug('UbuntuMan: Success')
                     self.__setParser(lang)
                     self.parser.url = url
                     self.parser.command = command
@@ -316,9 +317,9 @@ class UbuntuMan(callbacks.Plugin):
                 irc.reply('No manual page for \'%s\'' % command)
                 return
             self.parser.parse(fd, command, format)
-            for var in self.parser.keywords.keysParsed:
-                log.debug('UbuntuMan.man() %s=\'%s\'' % (var,
-                    getattr(self.parser, var)))
+            #for var in self.parser.keywords.keysParsed:
+            #    log.debug('UbuntuMan.man() %s=\'%s\'' % (var,
+            #        getattr(self.parser, var)))
             fd.close()
             msg = self.__formatReply()
             irc.reply(msg)
@@ -328,6 +329,9 @@ class UbuntuMan(callbacks.Plugin):
             self.log.info(
                 'plugins.UbuntuMan: Failed to parse the manpage in \'%s\'. ' \
                 'Report it to the plugin maintainer.' % self.parser.url)
+
+    man = wrap(man, ['something', getopts({'rel':'something',
+                                           'lang':'something'})])
 
     def manurl(self, irc, msg, args, command, optlist):
         """<command> [--rel <release>] [--lang <language>]
@@ -351,10 +355,8 @@ class UbuntuMan(callbacks.Plugin):
         except:
             pass
 
-    man = wrap(man, ['something', getopts({'rel': 'something',
-                                           'lang' : 'something'})])
-    manurl = wrap(manurl, ['something', getopts({'rel': 'something',
-                                                 'lang' : 'something'})])
+    manurl = wrap(manurl, ['something', getopts({'rel':'something',
+                                                 'lang':'something'})])
 
 
 Class = UbuntuMan

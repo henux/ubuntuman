@@ -45,6 +45,7 @@ class UbuntuManTestCase(PluginTestCase):
             self.assertNotRegexp('man ls --lang %s' % s, '^Failed to parse')
             self.assertNotRegexp('man bash --lang %s' % s, '^Failed to parse')
         self.assertNotRegexp('man su --lang fi', '^Failed to parse')
+        # this fails for now
         #self.assertNotRegexp('man aptitude --lang fi', '^Failed to parse')
 
     def testFormat(self):
@@ -64,7 +65,7 @@ class UbuntuManTestCase(PluginTestCase):
             conf.supybot.plugins.UbuntuMan.format.setValue('$description')
             self.assertRegexp('man %s' % cmd, r'^%s.{10}' % cmd)
             conf.supybot.plugins.UbuntuMan.format.setValue(
-                    'prefix | $name | $url | $description | $synopsis | subfix')
+                   'prefix | $name | $url | $description | $synopsis | subfix')
             self.assertRegexp('man %s' % cmd, r'^prefix.*subfix$')
         finally:
             conf.supybot.plugins.UbuntuMan.format.setValue(confbak)
