@@ -141,6 +141,7 @@ class UbuntuManParser_fi(UbuntuManParser):
         UbuntuManParser.parseName(self, fd, ('NAME', 'NIMI'))
 
     def parseSynopsis(self, fd):
+        # FIXME aptitude manpage fails
         UbuntuManParser.parseSynopsis(self, fd, ('SYNOPSIS', 'YLEISKATSAUS'))
 
     def parseDesc(self, fd):
