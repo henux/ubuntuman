@@ -67,4 +67,15 @@ conf.registerGlobalValue(UbuntuMan, 'language',
              """Determines the default language. Currently supported: de, en,
              es, fi, fr, it"""))
 
+conf.registerGlobalValue(UbuntuMan, 'format',
+    registry.String(
+    '$name | $synopsis | $description | Run « man $command » in a terminal',
+    """Determines de format of the reply. Supported keywords: $command,
+    $url, $name, $synopsis, $description"""))
+
+conf.registerGlobalValue(UbuntuMan, 'maxLength',
+    registry.Integer(300, """Determines maximun length of the output, if
+        supybot.reply.mores.length has a value other than zero this register
+        has no effect."""))
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
