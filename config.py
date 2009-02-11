@@ -65,6 +65,6 @@ conf.registerGlobalValue(UbuntuMan, 'sections',
 conf.registerGlobalValue(UbuntuMan, 'language',
     registry.String('en',
              """Determines the default language. Currently supported: de, en,
-             es, fi, it"""))
+             es, fi, fr, it"""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

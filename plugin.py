@@ -159,6 +159,13 @@ class UbuntuManParser_it(UbuntuManParser):
         UbuntuManParser.parseDesc(self, fd, ('DESCRIZIONE', 'DESCRIPTION'))
 
 
+class UbuntuManParser_fr(UbuntuManParser):
+    """Ubuntu manual page parser for French."""
+
+    def parseName(self, fd):
+        UbuntuManParser.parseName(self, fd, ('NOM', 'NAME'))
+
+
 class UbuntuMan(callbacks.Plugin):
     """This plugin provides commands for displaying UNIX manual pages from
     the Ubuntu Manpage repository."""
