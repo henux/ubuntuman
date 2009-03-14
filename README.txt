@@ -18,8 +18,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 To download the latest version of this software, please visit:
 
-    http://henux.nor.fi/coding/projects/9-other/7-ubuntuman
-    http://github.com/henux/ubuntuman/tree/master
+    http://henux.nor.fi/projects/ubuntuman.php
+    http://github.com/henux/ubuntuman
 
 
 INTRODUCTION
@@ -34,7 +34,8 @@ was decided on.
 
 Thanks to emma and bascule for their continued support and several others
 in ##club-ubuntu for bug testing.  Also thanks to Terence Simpson for his
-contribution and to Elián Hanisch for non-English manual page support.
+contribution and to Elián Hanisch for non-English manual page support and
+other extensive contributions.
 
 
 USAGE

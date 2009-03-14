@@ -34,7 +34,7 @@ __contributors__ = {supybot.Author('Terence Simpson', 'stdin', ''): '',
                     supybot.Author('Elián Hanisch', 'm4v', 'lambdae2@gmail.com'): ''}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = 'http://henux.nor.fi/coding/projects/9-other/7-ubuntuman'
+__url__ = 'http://henux.nor.fi/projects/ubuntuman.php'
  # 'http://supybot.com/Members/yourname/UbuntuMan/download'
 
 import config
