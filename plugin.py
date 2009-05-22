@@ -226,7 +226,10 @@ class UbuntuMan(callbacks.Plugin):
         if parserClass == self.currentParser:
             # Don't initialise the parser again if it isn't needed.
             return
-        module = sys.modules['UbuntuMan.plugin']
+        if "UbuntuMan.plugin" in sys.modules:
+            module = sys.modules["UbuntuMan.plugin"]
+        else:
+            module = sys.modules['ubuntuman.plugin']
         # Looks for the parser class that matchs the language set in the
         # config, or defaults to UbuntuManParser_en.
         self.parser = hasattr(module , parserClass) \
