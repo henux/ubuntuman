@@ -1,5 +1,5 @@
 # -*- Encoding: UTF-8 -*-
-# Copyright (c) 2008 Henri Häkkinen
+# Copyright (c) 2009 Henri Häkkinen, Elián Hanisch.
 #
 # This file is part of the UbuntuMan Supybot IRC plugin.
 #
@@ -74,8 +74,12 @@ conf.registerGlobalValue(UbuntuMan, 'format',
     $url, $name, $synopsis, $description"""))
 
 conf.registerGlobalValue(UbuntuMan, 'maxLength',
-    registry.Integer(300, """Determines maximun length of the output, if
+        registry.Integer(300, """Determines maximun length of the output, if
         supybot.reply.mores.length has a value other than zero this register
         has no effect."""))
+
+conf.registerGlobalValue(UbuntuMan, 'cachedir',
+        registry.String('', """Determines the location of the local manual page
+        cache."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -1,7 +1,0 @@
-UbuntuMan TODO
-
-Support for more languages.
-
-The current version looks for sections NAME, SYNOPSIS and DESCRIPTION from
-the manual page.  Not all manual pages have these and in these cases the
-plugin just gives an error.

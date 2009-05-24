@@ -1,5 +1,5 @@
 # -*- Encoding: UTF-8 -*-
-# Copyright (c) 2008 Henri Häkkinen
+# Copyright (c) 2009 Henri Häkkinen, Elián Hanisch.
 #
 # This file is part of the UbuntuMan Supybot IRC plugin.
 #

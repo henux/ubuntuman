@@ -1,5 +1,5 @@
 # -*- Encoding: UTF-8 -*-
-# Copyright (c) 2008 Henri Häkkinen
+# Copyright (c) 2009 Henri Häkkinen, Elián Hanisch.
 #
 # This file is part of the UbuntuMan Supybot IRC plugin.
 #
@@ -24,9 +24,9 @@ Repository.
 import supybot
 import supybot.world as world
 
-__version__ = '1.2.0'
+__version__ = '2.0.0a'
 
-__author__ = supybot.Author('Henri Hakkinen', 'henux', 'henux@users.sourceforge.net')
+__author__ = supybot.Author('Henri Hakkinen', 'henux', 'henuxd@gmail.com')
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.

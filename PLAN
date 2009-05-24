@@ -1,0 +1,127 @@
+UBUNTUMAN NEXT-GEN PLAN FILE
+
+This branch is a complete rewrite of the internal structures of the
+UbuntuMan plugin. Goals of this rewrite is to reduce network traffic by
+caching manual pages into a local disk and removing the hacky HTML page
+parser with another parser which reads the groff manual page sources
+directly.
+
+The Canonical's Ubuntu Manpage repository contains gzipped manpages in:
+
+    http://manpages.ubuntu.com/manpages.gz
+
+Our fundamental goal is to read and parse these manual pages, instead
+of the HTML ones.
+
+
+THE NEW INTERNAL STRUCTURE OF UBUNTUMAN PLUGIN
+
+* UbuntuMan
+
+  This is the driver class which interfaces with supybot. The following
+  supybot commands are provided:
+
+  - man <command> [--rel <release>] [--lang <language>] [--nocache]
+
+    Displays a UNIX manpage for <command>. The --rel and --lang options
+    work as in the previous version of UbuntuMan. The new --nocache
+    options forces the manpage to be reloaded from the Ubuntu Manpage
+    repository instead of using the cached one.
+
+  - manurl <command> [--rel <release>] [--lang <language]
+
+    Works as in the previous version of UbuntuMan.
+
+  - mancache <operation>
+
+    Operates the local manpage cache. This command is reserved for
+    admins only.  <operation> may be one of the following:
+
+    - flush [<command>]
+      Removes the cached manpage for <command> or if the argument is
+      not given, the whole cache.
+
+    - size
+      Displays the amount of disk space used by the cache in
+      human-readable form, such as 40 KB or 2 MB etc.
+
+
+* ManpageCache
+
+  Implements the manpage cache (see THE MANPAGE CACHE below). Manual
+  pages may be requested from the cache by specifying the Ubuntu release
+  (such as 'jaunty'), the language code (such as, 'en'), the manpage
+  section number (such as, 2) and the manpage name (such as, 'ls').
+
+  If the manpage requested is not found in the cache, then this class
+  handles the proper downloading, parsing and caching of the manpage
+  from the Canonical's repository. The caller therefore never knows if
+  the manpage was downloaded or processed locally.
+
+
+* ManpageParser
+
+  Abstract interface class for parsing manual pages. Derived classes are
+  expected to implement parsers for one language, such English, Finnish
+  etc. The class is given a file descriptor handle which it expects to
+  able to read clear text (gunzippped) manpage sources and the parser
+  outputs a dictionary containing data elements read, such as 'command',
+  'name', 'synopsis', 'description' etc.
+
+
+
+THE MANPAGE CACHE
+
+The manpage cache is a hierarchial directory structure containing
+pre-parsed manpages.  The cache is organized into subdirectories based
+on the Ubuntu release, language and section. For example, the Jaunty
+English manpage of ls(2) would be stored as the file:
+
+  ./jaunty/en/man2/ls.repr
+
+in the cache basedir (configurable supybot variable). The cache
+files are basically repr dumps of the dictionary objects returned by
+a ManpageParser class. This has the elegance and advantage that these
+files may be written by simple calls of `fd.write(repr(d))` where `fd`
+is the file descriptor for writing into the `ls.repr` file and `d` is
+the dictionary object representing a manpage and then read back into
+memory by `d = eval(fd.read())`.
+
+Therefore a ManpageParser is invoked only once to parse a manpage read
+from the Manpage repository. There is no need to store the complete
+gzipped manpages to the cache and this is also much more efficient and
+simpler approach. We could also gzip these preparsed manpage files to
+condense space:
+
+  ./jaunty/en/man2/ls.repr.gz
+
+This however is best left for later versions of UbuntuMan I think...
+
+
+WORKFLOW OF REQUESTING A MANPAGE
+
+A user invokes `man ls --rel jaunty --lang en` command. The general workflow
+would be something like the following:
+
+1. UbuntuMan.man method calls ManpageCache.fetch with proper arguments.
+
+2. ManpageCache.fetch checks if the requested manpage is cached.
+ 2a. If yes; opens the cache file and eval's it's contents. The resulting
+     object is returned.
+ 2b. If no; builds the URL to the gzipped manpage, opens it, passes it through
+     gunzip, calls approative ManpageParser.parse giving it the fd, stores the
+     return value's repr to a cache file and finally returns the object to the
+     caller.
+
+3. UbuntuMan.man checks that the returned object is actually a dictionary and
+   then formats and displays the final output.
+
+
+ISSUE: How should the ManpageCache know which derived ManpageParser class's parse
+       method to call?
+
+>>>>>  ManpageCache should probably hold a dictionary object of mappings between
+       language codes to ManpageParser objects? This might be a better solution
+       than the slightly hacky sys.modules approach in the UbuntuMan 1.x line.
+       At plugin load-time, this dictionary is registered with all the available
+       parser classes.
