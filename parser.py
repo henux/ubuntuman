@@ -14,3 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+class ManpageParser:
+    """
+    Manual page parser interface.
+
+    Derived classes are expected to implement `parse(fd)` method to parse a
+    manual page for a specific language from the given file descriptor. The
+    manual page is given as a groff source and the returned value is expected
+    to be a dictionary containing elements for each parsed data.
+
+    Parser objects are 'one shot' only -- once the manual page is parsed, the
+    parser is not used again and is thrown away.
+    """
+    pass
+
+# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

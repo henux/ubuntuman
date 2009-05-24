@@ -37,6 +37,7 @@ class UbuntuMan(callbacks.Plugin):
         """<command> [--rel <release>] [--lang <language>] [--nocache]
 
         Displays a manual page from the Ubuntu Manpage Repository."""
+        # TO BE IMPLEMENTED
         pass
 
     def manurl(self, irc, msg, args, command, optlist):
@@ -44,6 +45,7 @@ class UbuntuMan(callbacks.Plugin):
 
         Gives the URL to the full manual page in the Ubuntu Manpage
         Repository."""
+        # TO BE IMPLEMENTED
         pass
 
     def mancache(self, irc, msg, args, command, optlist):
@@ -53,6 +55,7 @@ class UbuntuMan(callbacks.Plugin):
         flush [<command>]
         size
         """
+        # TO BE IMPLEMENTED
         pass
 
     man = wrap(man, ['something', getopts({'rel':'something', 'lang':'something', 'nocache':'something'}))

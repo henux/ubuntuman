@@ -14,3 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+class ManpageParser_en(ManpageParser):
+    """
+    Manual page parser for the English language
+    """
+    def parse(self, fd):
+        # TO BE IMPLEMENTED
+        pass
+
+# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
