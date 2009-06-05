@@ -30,8 +30,8 @@ def configure(advanced):
                         default="http://manpages.ubuntu.com/manpages")
 
     release = expect("""What value should be used as the default Ubuntu release?""",
-                     possibilities=['dapper', 'gutsy', 'hardy', 'intrepid',
-                         'jaunty'],
+                     possibilities=['dapper', 'hardy', 'intrepid', 'jaunty',
+                         'karmic'],
                      default='jaunty')
 
     sections = something("""What manual page sections should be enabled?""",
