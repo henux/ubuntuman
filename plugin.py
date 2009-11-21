@@ -79,10 +79,10 @@ class UbuntuManParser:
                 raise UbuntuManError('Section %s not found.' % \
                         ', '.join(section))
             for s in section:
-                tag = '<h3>%s</h3>' % s
+                tag = '<h4><b>%s</b></h4>' % s
                 idx = ln.find(tag)
                 if idx > -1:
-                    ln = ln[idx + len(tag) + 5:]
+                    ln = fd.readline()
                     ln = utils.web.htmlToText(ln, tagReplace='')
                     ln = utils.str.normalizeWhitespace(ln)
                     return ln
@@ -90,7 +90,7 @@ class UbuntuManParser:
     def parseName(self, fd, section='NAME'):
         """Parse the NAME section."""
         #log.debug('UbuntuManParser.parseName() parsing ...')
-        self.name = self.skipToSection(fd, section)
+        self.name = self.skipToSection(fd, section).split()[0]
 
     def parseSynopsis(self, fd, section='SYNOPSIS'):
         """Parse the SYNOPSIS section.  Only the first line is read."""

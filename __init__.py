@@ -24,7 +24,7 @@ Repository.
 import supybot
 import supybot.world as world
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 __author__ = supybot.Author('Henri Hakkinen', 'henux', 'henux@users.sourceforge.net')
 
